@@ -1,6 +1,9 @@
-﻿using ElasticSearchSample.API.Models;
+﻿using Elasticsearch.Net;
 
+using ElasticSearchSample.API.Models;
 using Nest;
+
+using static System.Reflection.Metadata.BlobBuilder;
 
 namespace ElasticSearchSample.API.Extensions;
 
@@ -12,7 +15,7 @@ public static class ElasticSearchExtensions
         var url = configuration["ElasticSearchConfiguration:Uri"];
         var defaultIndex = configuration["ElasticSearchConfiguration:index"];
 
-        var settings = new ConnectionSettings(new Uri(url)).BasicAuthentication("elastic", "9psHigdZINQaM0q=Ijbi")
+        var settings = new ConnectionSettings(new Uri(url))
             .PrettyJson()
             .DefaultIndex(defaultIndex);
 

@@ -1,4 +1,6 @@
-﻿using Nest;
+﻿using ElasticSearchSample.API.Models;
+
+using Nest;
 
 namespace ElasticSearchSample.API.Abstractions;
 
@@ -6,7 +8,7 @@ namespace ElasticSearchSample.API.Abstractions;
 /// ElasticSearch service
 /// </summary>
 /// <typeparam name="T">Result document</typeparam>
-public interface IElasticSearchService<T> where T: class
+public interface IElasticSearchService<T> where T: BaseEntity
 {
     /// <summary>
     /// Create an index for new document
@@ -20,7 +22,7 @@ public interface IElasticSearchService<T> where T: class
     /// </summary>
     /// <param name="id">Document's unique ID</param>
     /// <returns></returns>
-    Task<T> GetAsync(string id);
+    Task<T> GetAsync(Guid id);
 
     /// <summary>
     /// Searchs documents
@@ -39,13 +41,13 @@ public interface IElasticSearchService<T> where T: class
     /// <param name="document">Exist document</param>
     /// <param name="id">Document's unique ID</param>
     /// <returns></returns>
-    Task<T> UpdateAsync(string id, T document);
+    Task<T> UpdateAsync(Guid id, T document);
 
     /// <summary>
     /// Deletes an indexed document
     /// </summary>
     /// <param name="id">Document's unique ID</param>
     /// <returns></returns>
-    Task DeleteAsync(string id);
+    Task DeleteAsync(Guid id);
 
 }

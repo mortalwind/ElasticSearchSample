@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 
 using Nest;
 
+using System.Xml.Linq;
+
 namespace ElasticSearchSample.API.Controllers;
 
 
@@ -13,14 +15,26 @@ namespace ElasticSearchSample.API.Controllers;
 [ApiController]
 public class UsersController : ControllerBase
 {
-	private readonly IDataRepository<User> _repository;
 	private readonly UserSearchService _elasticSearch; 
     private readonly IElasticClient _elasticClient;
-    public UsersController(IDataRepository<User> repository, IElasticClient elasticClient)
+    public UsersController(IElasticClient elasticClient)
 	{
-		_repository = repository;
 		_elasticClient = elasticClient;
 		_elasticSearch = new UserSearchService(_elasticClient);
+    }
+
+
+	[HttpPost]
+	public async Task<ActionResult> Post([FromBody] User newUser) {
+
+		var response = await _elasticSearch.IndexAsync(newUser);
+		
+		if (response.IsValid)
+		{
+			return CreatedAtAction("Get", new { name = newUser.Name, lastname = newUser.Lastname, pageIndex = 0, count = 1 });
+		}
+
+		return BadRequest(response.OriginalException.Message);
     }
 
 	[HttpGet]
@@ -30,24 +44,7 @@ public class UsersController : ControllerBase
 			return BadRequest("Search criteria is empty");
 		}
 		var searchResult = await _elasticSearch.SearchAsync(name, lastname, pageIndex, count);
+        return Ok(searchResult);
 
-		if (searchResult.Any())
-		{
-			return Ok(searchResult);
-		}
-		else
-		{
-			var result = _repository.SearchAsync(x =>
-				(x.Name.Equals(name) || string.IsNullOrEmpty(name)) &&
-				(x.Lastname.Equals(lastname) || string.IsNullOrEmpty(lastname))).Result;
-
-			foreach (var item in result)
-			{
-				await _elasticSearch.IndexAsync(item);
-			}
-
-            return Ok(result);
-        }
-		
-	}
+    }
 }

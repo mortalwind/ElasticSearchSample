@@ -2,9 +2,7 @@
 
 namespace ElasticSearchSample.API.Models;
 
-public class BaseEntity
+public abstract class BaseEntity
 {
-
-    [Column(name: "id")]
     public Guid Id { get; set; }
 }
